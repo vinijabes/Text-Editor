@@ -9,4 +9,8 @@ void MoveUpCB();
 void MoveDownCB();
 void MoveToLineInit();
 void Highlight();
+
+void clean();
+void printList();
+void breakLineCB();
 #endif

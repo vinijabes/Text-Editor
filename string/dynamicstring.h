@@ -24,15 +24,16 @@ typedef struct str{
 
 void InitString(DynamicString *str);
 void moveIterator(DynamicString *str, size_t pos);
-void addCharacter(DynamicString *str, char ch);
-void pushCharacter(DynamicString *str, char ch);
-void insertCharacter(DynamicString *str, char ch);
+void addCharacter(DynamicString *str, int ch);
+void pushCharacter(DynamicString *str, int ch);
+void insertCharacter(DynamicString *str, int ch);
 
 void addCharArray(DynamicString *str, char *ch);
 void pushCharArray(DynamicString *str, char *ch);
 void insertCharArray(DynamicString *str, char *ch);
 
-
+DynamicString * breakString(DynamicString *str, int pos);
+DynamicString * newLine();
 
 void printString(DynamicString *str);
 

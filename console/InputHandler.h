@@ -12,8 +12,12 @@
 
 #include <windows.h>
 #include <time.h>
+#include "../string/dynamicstring.h"
+#include "../string/dynamicstringlist.h"
 
 COORD cursor;
+
+DynamicStringList lines;
 
 typedef enum{
 	false, true
@@ -43,14 +47,15 @@ typedef struct{
 	InputCallbackList callbacks[CALLBACK_LIST_COUNT];
 } StateCallbacks;
 
-StateCallbacks initialState;
+StateCallbacks *currState;
 
 void initInput();
 
 bool keyPressed(int key);
 bool keyReleased(int key);
-void registerCallback(int key, bool shift, bool cntrl, bool keyDown, float interval, void (*cb)());
+void registerCallback(StateCallbacks* state, int key, bool shift, bool cntrl, bool keyDown, float interval, void (*cb)());
 
+StateCallbacks *newState();
 void initInputCallbackList(InputCallbackList* list);
 void pushCallback(InputCallbackList* list, int key, bool shift, bool cntrl, bool keyDown, float interval, void (*cb)());
 void runAllCallbacks();

@@ -17,8 +17,7 @@ void initOutput(){
 	wOldColorAttrs = oldCsbiInfo.wAttributes;
 	consoleBuffer.X = oldCsbiInfo.srWindow.Right - oldCsbiInfo.srWindow.Left + 1;
 	consoleBuffer.Y = oldCsbiInfo.srWindow.Bottom - oldCsbiInfo.srWindow.Top + 1;
-	
-	printf("\n%d\n",consoleBuffer.Y);
+
 	//COORD newSize = {9999,9999};
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), consoleBuffer);
 }

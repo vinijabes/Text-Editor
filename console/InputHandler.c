@@ -32,12 +32,13 @@ void initInput(){
 	GetConsoleMode(hStdin, &fdwMode);
 	SetConsoleCtrlHandler(NULL, 0);
 	int i = 0;
-	for(; i < CALLBACK_LIST_COUNT; i++){
-		initInputCallbackList(&callbacks[i]);
-	}
+	currState = newState();
 	
 	cursor.X = 0;
 	cursor.Y = 0;
+	
+	InitStringList(&lines);
+	addString(&lines, newLine());
 }
 
 bool keyPressed(int key){
@@ -48,20 +49,35 @@ bool keyReleased(int key){
 	return GetKeyState(key) & 0x0001;
 }
 
+StateCallbacks *newState(){
+	int i = 0;
+	StateCallbacks *ns = (StateCallbacks*) malloc(sizeof(StateCallbacks));
+	for(; i < CALLBACK_LIST_COUNT; i++){
+		initInputCallbackList(&(ns->callbacks[i]));
+	}
+	
+	return ns;
+}
+
 void initInputCallbackList(InputCallbackList* list){
 	list->end = list->init = NULL;
 }
 
-void registerCallback(int key, bool shift, bool cntrl, bool keyDown, float interval, void (*cb)()){
-	if(shift && cntrl){
-		pushCallback(&callbacks[SHIFT_CNTRL_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
-	}else if(shift){
-		pushCallback(&callbacks[SHIFT_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
-	}else if(cntrl){
-		pushCallback(&callbacks[CNTRL_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
-	}else{
-		pushCallback(&callbacks[KEYSTROKE_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
+void registerCallback(StateCallbacks* state, int key, bool shift, bool cntrl, bool keyDown, float interval, void (*cb)()){
+	if(state == NULL){
+		state = currState;
 	}
+	
+	if(shift && cntrl){
+		pushCallback(&state->callbacks[SHIFT_CNTRL_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
+	}else if(shift){
+		pushCallback(&state->callbacks[SHIFT_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
+	}else if(cntrl){
+		pushCallback(&state->callbacks[CNTRL_CALLBACK], key, shift, cntrl, keyDown, interval, cb);
+	}else{
+		pushCallback(&(state->callbacks[KEYSTROKE_CALLBACK]), key, shift, cntrl, keyDown, interval, cb);
+	}
+	
 }
 
 void pushCallback(InputCallbackList* list, int key, bool shift, bool cntrl, bool keyDown, float interval, void (*cb)()){
@@ -77,7 +93,6 @@ void pushCallback(InputCallbackList* list, int key, bool shift, bool cntrl, bool
 	
 	if(list->init == NULL){
 		list->init = node;
-		printf("%d\n", list->init);
 	}
 		
 	if(list->end != NULL){
@@ -90,6 +105,7 @@ void pushCallback(InputCallbackList* list, int key, bool shift, bool cntrl, bool
 
 void runAllCallbacks(InputCallbackList *list){
 	InputCallbackListNode *ini = list->init;
+	
 	while(ini){
 		if(ini->callback.keyDown && keyPressed(ini->callback.key) && (float) clock()/CLOCKS_PER_SEC - (float) ini->callback.lastCall/CLOCKS_PER_SEC > ini->callback.interval){
 			ini->callback.cb();
@@ -99,6 +115,7 @@ void runAllCallbacks(InputCallbackList *list){
 		}
 		ini = ini->next;
 	}
+	
 }
 
 void handleInput(){
@@ -134,23 +151,22 @@ bool handleKeyboard(){
 	int c;
 	if(keyPressed(VK_SHIFT)){
 		if(keyPressed(VK_CONTROL)){
-			runAllCallbacks(&callbacks[SHIFT_CNTRL_CALLBACK]);
+			runAllCallbacks(&currState->callbacks[SHIFT_CNTRL_CALLBACK]);
 			while(_kbhit()){
 				getch();
 			}
 		}else{
-			runAllCallbacks(&callbacks[SHIFT_CALLBACK]);
-			
+			runAllCallbacks(&currState->callbacks[SHIFT_CALLBACK]);		
 		}
 		
 		handleKeystroke();
 		return true;
 	}else if(keyPressed(VK_CONTROL)){
-		runAllCallbacks(&callbacks[CNTRL_CALLBACK]);
+		runAllCallbacks(&currState->callbacks[CNTRL_CALLBACK]);
 		clearInputBuffer();
 		return true;
 	}else{
-		runAllCallbacks(&callbacks[KEYSTROKE_CALLBACK]);
+		runAllCallbacks(&(currState->callbacks[KEYSTROKE_CALLBACK]));
 		return handleKeystroke();
 	}
 	
@@ -165,7 +181,7 @@ bool handleKeystroke(){
 			clearInputBuffer();
 			return false;
 		}
-			
+		addCharacter(lines.it.current->str, c);
 		putchar(c);
 		++cursor.X;
 		gotoxy(cursor.X, cursor.Y);
@@ -216,5 +232,7 @@ void gotoxy(int x, int y){
   coord.X = x;
   coord.Y = y;
   cursor = coord;
+  moveListIterator(&lines, y);
+  moveIterator(lines.it.current->str, x);
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
