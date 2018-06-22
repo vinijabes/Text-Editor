@@ -1,0 +1,6 @@
+﻿  SelectingCallback.c
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\selectingcallback.c(7): warning C4013: 'setAttributes' indefinido; assumindo extern retornando int
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\selectingcallback.c(78): warning C4018: '<=': incompatibilidade de signed/unsigned
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\selectingcallback.c(156): warning C4244: '=': conversão de 'unsigned short' para 'char', possível perda de dados
+  TextEditor.vcxproj -> C:\Users\Vinicius\Source\Repos\TextEditor\Debug\TextEditor.exe
+  TextEditor.vcxproj -> C:\Users\Vinicius\Source\Repos\TextEditor\Debug\TextEditor.pdb (Partial PDB)
