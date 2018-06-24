@@ -42,6 +42,7 @@ void initInput(){
 }
 
 bool keyPressed(int key){
+	GetKeyState(VK_F12);
 	return GetKeyState(key) & 0x8000;
 }
 
@@ -181,6 +182,7 @@ bool handleKeystroke(){
 			clearInputBuffer();
 			return false;
 		}
+
 		addCharacter(lines.it.current->str, c);
 		putchar(c);
 		++cursor.X;

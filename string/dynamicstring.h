@@ -23,7 +23,7 @@ typedef struct str{
 
 
 void InitString(DynamicString *str);
-void moveIterator(DynamicString *str, size_t pos);
+void moveIterator(DynamicString *str, int pos);
 void addCharacter(DynamicString *str, int ch);
 void pushCharacter(DynamicString *str, int ch);
 void insertCharacter(DynamicString *str, int ch);

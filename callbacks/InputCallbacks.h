@@ -13,4 +13,5 @@ void Highlight();
 void clean();
 void printList();
 void breakLineCB();
+void writeToFile();
 #endif

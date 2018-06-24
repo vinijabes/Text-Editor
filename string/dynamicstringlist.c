@@ -9,6 +9,11 @@ void InitStringList(DynamicStringList *list){
 }
 
 void moveListIterator(DynamicStringList *list, size_t pos){
+	if(pos == 0){
+		list->it.pos = 0;
+		list->it.current = list->ini;
+	}
+	
 	if(pos > list->size-1){
 		list->it.pos = SIZE_MAX;
 		list->it.current = list->end;
@@ -129,4 +134,5 @@ void printAll(DynamicStringList *list){
 		printString(curr->str);
 		curr = curr->next;
 	}
+	
 }

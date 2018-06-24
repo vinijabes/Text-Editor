@@ -11,7 +11,7 @@ typedef struct stringListNode{
 
 typedef struct{
 	DynamicStringListNode *current;
-	size_t pos;
+	int pos;
 } StringListIterator;
 
 typedef struct{

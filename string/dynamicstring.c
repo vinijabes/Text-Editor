@@ -5,65 +5,36 @@ void InitString(DynamicString *str){
 	str->ini = NULL;
 	str->end = NULL;
 	str->it.current = NULL;
-	str->it.pos = 0;
+	str->it.pos = -1;
 	str->size = 0;
 }
 
-void moveIterator(DynamicString *str, size_t pos){
-	if(pos == str->size - 1){
+void moveIterator(DynamicString *str, int pos){
+	if(pos < 0){
+		str->it.pos = -1;
+		str->it.current = NULL;
 		return;
 	}
-	if(pos > str->size - 1){
-		str->it.pos = SIZE_MAX;
+	
+	if(pos >= str->size){		
+		str->it.pos = str->size - 1;
 		str->it.current = str->end;
 		return;
 	}
-	
+
 	if(str->it.current == NULL){
-		if(str->size > pos/2){
-			
-			str->it.current = str->end;
-			str->it.pos = str->size-1;
-			
-			while(str->it.current && str->it.pos > pos){
-				str->it.current = str->it.current->prev;
-				--str->it.pos;
-			}
-			
-		}else if(str->size < pos/2){
-			
-			str->it.current = str->ini;
-			str->it.pos = 0;
-			
-			while(str->it.current && str->it.pos < pos){
-				str->it.current = str->it.current->next;
-				++str->it.pos;
-			}
-			
-		}else{
-			return;
-		}
-	}else{
-		if(str->it.pos == SIZE_MAX){
-			str->it.pos = str->size - 1;
-		}
-		if(str->it.pos < pos){
-			while(str->it.current && str->it.pos < pos){
-				str->it.current = str->it.current->next;
-				++str->it.pos;
-			}
-		}else if(str->it.pos > pos){
-			while(str->it.current && str->it.pos > pos){
-				str->it.current = str->it.current->prev;
-				--str->it.pos;
-			}			
-		}else{
-			return;
-		}
-		
+		str->it.current = str->ini;
+		str->it.pos = 0;
+	}
+	while(pos > str->it.pos){
+		str->it.current = str->it.current->next;
+		str->it.pos++;
 	}
 	
-	if(str->it.pos < 0) str->it.pos = 0;
+	while(pos < str->it.pos){
+		str->it.current = str->it.current->prev;
+		str->it.pos--;
+	}	
 }
 
 void addCharacter(DynamicString *str, int ch){
@@ -72,27 +43,32 @@ void addCharacter(DynamicString *str, int ch){
 	newCh->prev = NULL;
 	newCh->ch = ch;
 	
-	if(str->it.pos == SIZE_MAX){
+	if(str->size == 0){
 		free(newCh);
 		pushCharacter(str, ch);
 		return;
 	}
 	
-	if(str->it.current != NULL){
-		newCh->next = str->it.current;
-		newCh->prev = str->it.current->prev;
-		if(str->it.current->prev){
-			str->it.current->prev->next = newCh;
-		}else{
-			str->ini = newCh;
-		}
-		str->it.current->prev = newCh;
-		++str->it.pos;
-	}else if(!str->ini){
+	if(str->it.pos == -1){
+		newCh->next = str->ini;
+		str->ini->prev = newCh;
 		str->ini = newCh;
-		str->end = newCh;
 		str->it.current = newCh;
-		str->it.pos = 1;
+		str->it.pos++;
+		++str->size;
+		return;
+	}
+	
+	if(str->it.current->next == NULL){
+		free(newCh);
+		pushCharacter(str, ch);		
+		return;
+	}else{
+		newCh->next = str->it.current->next;
+		newCh->prev = str->it.current;
+		str->it.current->next = newCh;
+		str->it.current = newCh;
+		str->it.pos++;
 	}
 	
 	++str->size;
@@ -116,12 +92,8 @@ void pushCharacter(DynamicString *str, int ch){
 		str->end = newCh;
 	}
 	
-	if(str->it.current == NULL){
-		str->it.pos = SIZE_MAX;
-		str->it.current = str->end;
-	}
-	
 	++str->size;
+	moveIterator(str, str->size);
 }
 
 void insertCharacter(DynamicString *str, int ch){
@@ -163,14 +135,14 @@ void insertCharArray(DynamicString *str, char *ch){
 }
 
 DynamicString * breakString(DynamicString *str, int pos){
-	DynamicString * newStr = (DynamicString *) malloc(sizeof(DynamicString));
-	InitString(newStr);
+	DynamicString * newStr = newLine();
 	
+	printf("IT->pos: %d, POS: %d\n", str->it.pos, pos);
 	
 	moveIterator(str, pos);
-	if(!str->it.current || str->it.pos == SIZE_MAX) return newLine();
-
-	printf("BREAKING ON %d\n", str->size);
+	addCharacter(str, '\n');
+	
+	if(str->it.pos == str->size-1) return newLine();
 
 	newStr->ini = str->it.current->next;
 	newStr->end = str->end;
@@ -178,16 +150,15 @@ DynamicString * breakString(DynamicString *str, int pos){
 	
 	str->end = str->it.current;
 	str->end->next = NULL;
-	str->it.current = str->ini;
-	str->it.pos = 0;
+	str->it.current = NULL;
+	str->it.pos = -1;
+	
 	if(pos > str->size){
 		newStr->size = 0;
 	}else{
 		newStr->size = str->size - pos;
 		str->size = pos + 1;
 	}
-	
-	//printString(newStr);
 	
 	return newStr;
 }
