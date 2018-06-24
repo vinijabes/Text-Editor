@@ -5,7 +5,7 @@
 #include "InputHandler.h"
 
 COORD consoleBuffer;
-bool outputActive = true;
+bool outputActive;
 
 void initOutput();
 void handleOutput();

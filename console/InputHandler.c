@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <locale.h>
 #include "InputHandler.h"
+#include "OutputHandler.h"
 #include "../callbacks/InputCallbacks.h"
 
 
@@ -42,8 +43,7 @@ void initInput(){
 }
 
 bool keyPressed(int key){
-	GetKeyState(VK_F12);
-	return GetKeyState(key) & 0x8000;
+	return GetAsyncKeyState(key) & 0x8000;
 }
 
 bool keyReleased(int key){
@@ -108,9 +108,11 @@ void runAllCallbacks(InputCallbackList *list){
 	InputCallbackListNode *ini = list->init;
 	
 	while(ini){
-		if(ini->callback.keyDown && keyPressed(ini->callback.key) && (float) clock()/CLOCKS_PER_SEC - (float) ini->callback.lastCall/CLOCKS_PER_SEC > ini->callback.interval){
-			ini->callback.cb();
-			ini->callback.lastCall = clock();
+		if(ini->callback.keyDown && keyPressed(ini->callback.key)){
+			if ((float)clock() / CLOCKS_PER_SEC - (float)ini->callback.lastCall / CLOCKS_PER_SEC > ini->callback.interval) {
+				ini->callback.cb();
+				ini->callback.lastCall = clock();
+			}
 		}else if(!ini->callback.keyDown && keyReleased(ini->callback.key)){
 			ini->callback.cb();
 		}
@@ -183,14 +185,17 @@ bool handleKeystroke(){
 			return false;
 		}
 
-		unwriteLineAfterIterator(lines.it.current->str);
-		addCharacter(lines.it.current->str, c);
-		gotoxy(cursor.X, cursor.Y);
-		putchar(c);
-		gotoxy(cursor.X, cursor.Y);
-		printStringIt(lines.it.current->str);
-		++cursor.X;
-		gotoxy(cursor.X, cursor.Y);
+		if (outputActive) {
+			unwriteLineAfterIterator(lines.it.current->str);
+			addCharacter(lines.it.current->str, c);
+			gotoxy(cursor.X, cursor.Y);
+			//putchar(c);
+			outputChar(c);
+			gotoxy(cursor.X, cursor.Y);
+			printStringIt(lines.it.current->str);
+			++cursor.X;
+			gotoxy(cursor.X, cursor.Y);
+		}
 		return true;
 	}
 	return false;

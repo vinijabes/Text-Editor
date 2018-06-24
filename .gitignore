@@ -34,3 +34,5 @@
 *.vcxproj
 
 TextEditor\.vcxproj\.filters
+
+Debug/
