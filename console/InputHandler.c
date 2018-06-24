@@ -262,3 +262,11 @@ int ascii_to_unicode(unsigned short ch) {
 	case 198: return 227; //ã
 	}
 }
+
+char *consoleScan() {
+	SetConsoleMode(hStdin, fdwSaveOldMode);
+	char *str = (char *) malloc(50);
+	scanf("%s", str);
+	SetConsoleMode(hStdin, fdwMode);
+	return str;
+}

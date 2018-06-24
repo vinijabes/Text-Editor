@@ -43,3 +43,25 @@ void setBufferSize(int x, int y){
 	consoleBuffer.Y = csbiInfo.srWindow.Bottom - csbiInfo.srWindow.Top + 1;;
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), consoleBuffer);
 }
+
+void setOutputState(bool state) {
+	outputActive = state;
+}
+
+void outputChar(char ch) {
+	if (outputActive) {
+		puchar(ch);
+	}
+}
+void outputCharArray(char *ch) {
+	while (ch != '\0') {
+		outputChar(ch);
+	}
+}
+void outputString(DynamicString *string) {
+	StringCharacter *pos = string->ini;
+	while (pos) {
+		outputChar(pos->ch);
+		pos = pos->next;
+	}
+}

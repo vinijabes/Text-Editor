@@ -1,6 +1,11 @@
-﻿  SelectingCallback.c
-c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\selectingcallback.c(7): warning C4013: 'setAttributes' indefinido; assumindo extern retornando int
-c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\selectingcallback.c(78): warning C4018: '<=': incompatibilidade de signed/unsigned
-c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\selectingcallback.c(156): warning C4244: '=': conversão de 'unsigned short' para 'char', possível perda de dados
+﻿  MenuCallbacks.c
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(39): warning C4133: '=': tipos incompatíveis - de 'char [31]' para 'LPCWSTR'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(40): warning C4133: '=': tipos incompatíveis - de 'CHAR *' para 'LPWSTR'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(42): warning C4133: '=': tipos incompatíveis - de 'char [19]' para 'LPCWSTR'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(45): warning C4133: 'função': tipos incompatíveis - de 'OPENFILENAME *' para 'LPOPENFILENAMEA'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(57): warning C4133: '=': tipos incompatíveis - de 'char [31]' para 'LPCWSTR'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(58): warning C4133: '=': tipos incompatíveis - de 'CHAR *' para 'LPWSTR'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(60): warning C4133: '=': tipos incompatíveis - de 'char [19]' para 'LPCWSTR'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\menucallbacks.c(63): warning C4133: 'função': tipos incompatíveis - de 'OPENFILENAME *' para 'LPOPENFILENAMEA'
   TextEditor.vcxproj -> C:\Users\Vinicius\Source\Repos\TextEditor\Debug\TextEditor.exe
   TextEditor.vcxproj -> C:\Users\Vinicius\Source\Repos\TextEditor\Debug\TextEditor.pdb (Partial PDB)

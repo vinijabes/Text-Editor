@@ -1,4 +1,4 @@
-#include "SelectingCallback.h"
+#include "../console/consoleio.h"
 #include <stdio.h>
 #include <Windows.h>
 
@@ -97,7 +97,7 @@ void copySelection() {
 	int posStart;
 	int posEnd;
 
-	if (selectionIni->line < selectionEnd->line) {
+	if (selectionIni->line <= selectionEnd->line) {
 		lineStart = selectionIni->line;
 		lineEnd = selectionEnd->line;
 
@@ -120,7 +120,10 @@ void copySelection() {
 		gotoxy(0, i);
 		if (i == lineStart) {
 			gotoxy(posStart, cursor.Y);
-			totalSize += lines.it.current->str->size - posStart;
+			if (lineStart != lineEnd)
+				totalSize += lines.it.current->str->size - posStart;
+			else
+				totalSize = posEnd - posStart + 1;
 		}else if(i == lineEnd){
 			totalSize += posEnd;
 		}else{
@@ -168,9 +171,68 @@ void copySelection() {
 	EmptyClipboard();
 	SetClipboardData(CF_TEXT, hMem);
 	CloseClipboard();
+
+	freeSelection();
 }
 
 void freeSelection() {
+	int x = cursor.X;
+	int y = cursor.Y;
+	int lineStart = min(selectionIni->line, selectionEnd->line);
+	int lineEnd = max(selectionIni->line, selectionEnd->line);
+	int posStart;
+	int posEnd;
+
+	if (selectionIni->line <= selectionEnd->line) {
+		lineStart = selectionIni->line;
+		lineEnd = selectionEnd->line;
+
+		if (selectionIni->line == selectionEnd->line) {
+			posStart = min(selectionIni->charPos, selectionEnd->charPos);
+			posEnd = max(selectionIni->charPos, selectionEnd->charPos);
+		}
+		else {
+			posStart = selectionIni->charPos;
+			posEnd = selectionEnd->charPos;
+		}
+	}
+	else {
+		lineStart = selectionEnd->line;
+		lineEnd = selectionIni->line;
+		posStart = selectionEnd->charPos;
+		posEnd = selectionIni->charPos;
+	}
+
+	int lineCharPosIni;
+	int lineCharPosEnd;
+	int auxiliarIndex = 0;
+	int i = lineStart;
+	int j;
+	while (i <= lineEnd) {
+		gotoxy(0, i);
+		if (i == lineStart) {
+			lineCharPosIni = posStart;
+			lineCharPosEnd = lines.it.current->str->size;
+		}
+		else if (i == lineEnd) {
+			lineCharPosIni = 0;
+			lineCharPosEnd = posEnd;
+		}
+		else {
+			lineCharPosIni = 0;
+			lineCharPosEnd = lines.it.current->str->size;
+		}
+		setDefaultAttributes();
+		j = lineCharPosIni;
+		while (j < lineCharPosEnd) {
+			gotoxy(j + 1, cursor.Y);
+			printf("\b%c",lines.it.current->str->it.current->ch);
+			++j;
+		}
+		auxiliarIndex += lineCharPosEnd - lineCharPosIni;
+		i++;
+	}
+
 	if (selectionIni) {
 		free(selectionIni);
 		selectionIni = NULL;
@@ -182,4 +244,5 @@ void freeSelection() {
 	}
 
 	setDefaultAttributes();
+	gotoxy(x, y);	
 }

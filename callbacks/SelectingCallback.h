@@ -2,8 +2,6 @@
 #define SELECTING_CALLBACK_H
 
 #include <stdlib.h>
-#include "../console/OutputHandler.h"
-#include "../console/InputHandler.h"
 
 typedef struct selectNode {
 	int line;

@@ -1,8 +1,6 @@
 #ifndef INPUT_CALLBACKS_H
 #define INPUT_CALLBACKS_H
 
-#include "SelectingCallback.h"
-
 void RegisterAllInputCallbacks();
 
 void MoveRightCB();

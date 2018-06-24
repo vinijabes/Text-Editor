@@ -68,4 +68,6 @@ void handleMouse(MOUSE_EVENT_RECORD mer);
 void gotoxy(int x, int y);
 
 int ascii_to_unicode(unsigned short ch);
+
+char *consoleScan();
 #endif
