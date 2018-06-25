@@ -64,16 +64,19 @@ void handleOutput(){
 
 
 		int end = min(outputLineEnd, csbiInfo.srWindow.Bottom + 1);
-		for (; j < end; j++) {
-			for (i = 0; i < maxSize; i++) {
+
+		i = 0;
+		COORD coord;
+		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+		while (outputLine < end) {
+			gotoxy(0, outputLine);
+			outputString(lines.it.current->str);
+			//coord.X = lines.it.current->str->size + 1;
+			//coord.Y = outputLine;
+			//SetConsoleCursorPosition(h, coord);
+			for (i = lines.it.current->str->size; i < maxSize; i++) {
 				outputChar(' ');
 			}
-			if(j != end) outputChar('\n');
-		}
-
-		while (outputLine < end) {
-			gotoxy(0, outputLine);			
-			outputString(lines.it.current->str);
 			++outputLine;
 		}
 		x = tempX != -1 ? tempX : x;

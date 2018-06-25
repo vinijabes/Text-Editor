@@ -29,9 +29,10 @@ void Backspace() {
 		gotoxy(0, lines.end);
 		unwriteLineAfterIterator(lines.it.current->str);
 		
-		moveListIterator(&lines, tempY + 1);
+		gotoxy(0, outputLine);
 		removeString(&lines);
 	}
+	
 	//unwriteLineAfterIterator(lines.it.current->str);
 	//gotoxy(cursor.X - 1, cursor.Y);
 	//printStringIt(lines.it.current->str);
@@ -56,6 +57,7 @@ void Delete() {
 		outputLine = cursor.Y;
 		outputLineEnd = cursor.Y + 1;
 		tempX = cursor.X - 1;
+		tempLineSize = consoleBuffer.X + 10;
 		unwriteLineAfterIterator(lines.it.current->str);
 		gotoxy(cursor.X + 1, cursor.Y);
 		removeCharacter(lines.it.current->str);
@@ -207,7 +209,7 @@ void breakLineCB(){
 	gotoxy(curr->str->size, cursor.Y);
 	outputChar('\n');
 	curr = curr->next;
-	outputLine = cursor.Y + 1;
+	outputLine = cursor.Y;
 	outputLineEnd = lines.size;
 	int y = cursor.Y + 1;
 	++cursor.Y;
@@ -242,6 +244,8 @@ void unwriteLineAfterIterator(DynamicString *str) {
 }
 
 void undoAction() {
+	int x = cursor.X;
+	int y = cursor.Y;
 	UndoStackNode * node;
 	if (tempNode->ini != NULL) {
 		node = tempNode;
@@ -250,18 +254,44 @@ void undoAction() {
 	else {
 		node = popStack(currStack);
 	}
+
+	if (!node) return;
+
 	outputLine = node->iniLine;
-	outputLineEnd = 10;
+	outputLineEnd = lines.size;
 	StringCharacter *aux;
-	if(node->ini->prev)
+	if(node->ini->prev){
 		node->ini->prev->next = node->end->next;
+	} else {
+		gotoxy(0, node->iniLine);
+		DynamicString *str = lines.it.current->str;
+		if (node->end->next) {
+			str->ini = node->end->next;
+		} else {
+			str->ini = NULL;
+		}
+	}
 
 	if(node->end->next)
 		node->end->next->prev = node->ini->prev;
+	else {
+		gotoxy(0, node->endLine);
+		DynamicString *str = lines.it.current->str;
+		if (node->ini->prev) {
+			str->end = node->ini->prev;
+		} else {
+			str->end = NULL;
+		}
+	}
+
+	outputLine = node->iniLine;
+	outputLineEnd = lines.size + 1;
 
 	int pos = lines.it.pos;
-	tempLineSize = 100;
+	tempLineSize = 180;
 	moveListIterator(&lines, node->iniLine);
 	lines.it.current->str->size = dynamicStringLen(lines.it.current->str);
 	moveListIterator(&lines, pos);
+
+	gotoxy(x, y);
 }

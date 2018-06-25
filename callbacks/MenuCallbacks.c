@@ -59,9 +59,14 @@ void loadFile() {
 		short ch;
 		int maxSize = 0;
 		while ((ch = fgetc(f)) != EOF) {
-			if (ch != '\n') {
+			if (ch != '\n' && ch != '\t') {
 				pushCharacter(str, ch);
-			}else{
+			} else if (ch == '\t') {
+				pushCharacter(str, ' ');
+				pushCharacter(str, ' ');
+				pushCharacter(str, ' ');
+				pushCharacter(str, ' ');
+			} else {
 				pushCharacter(str, ch);
 				maxSize = max(str->size, maxSize);
 				str = newLine();

@@ -178,7 +178,11 @@ void copySelection() {
 		}
 		while (j < lineCharPosEnd) {
 			gotoxy(j + 1, cursor.Y);
-			output[auxiliarIndex + j - lineCharPosIni] = ascii_to_unicode(lines.it.current->str->it.current->ch);
+			if (lines.it.current->next && j + 1 == lineCharPosEnd) {
+				output[auxiliarIndex + j - lineCharPosIni] = '\n';
+			}else {
+				output[auxiliarIndex + j - lineCharPosIni] = ascii_to_unicode(lines.it.current->str->it.current->ch);
+			}
 			++j;
 		}
 		if (i != lineEnd) {
@@ -210,7 +214,7 @@ void pasteClip() {
 		text = GetClipboardData(CF_UNICODETEXT);
 	}
 
-	outputLine = lines.it.pos;
+	outputLine = cursor.Y;
 	while (*text) {
 		if (*text != '\n') {
 			if (*text == '\r') {
@@ -218,16 +222,13 @@ void pasteClip() {
 				continue;
 			}
 			addCharacter(lines.it.current->str, *text);
-		}
-		else {
+		} else {
 			DynamicString *newStr = breakString(lines.it.current->str, lines.it.current->str->it.pos);
 			addString(&lines, newStr);
 		}
 		++text;
 	}
-	outputLineEnd = lines.it.pos + 2;
-	tempY = outputLineEnd;
-	tempX = lines.it.current->str->size;
+	outputLineEnd = lines.size;
 
 	CloseClipboard();
 }
