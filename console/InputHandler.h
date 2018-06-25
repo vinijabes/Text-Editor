@@ -47,7 +47,27 @@ typedef struct{
 	InputCallbackList callbacks[CALLBACK_LIST_COUNT];
 } StateCallbacks;
 
+typedef struct undoStackNode{
+	StringCharacter *ini;
+	StringCharacter *end;
+	int iniLine;
+	int endLine;
+	struct undoStackNode *next;
+} UndoStackNode;
+
+typedef struct undoStack {
+	UndoStackNode *topo;
+} UndoStack;
+
+UndoStack * initStack();
+void pushToStack(UndoStack *stack, UndoStackNode *node);
+UndoStackNode * newStackNode(StringCharacter *ini, StringCharacter *end, int iniLine, int endLine);
+UndoStackNode * popStack(UndoStack *stack);
+
 StateCallbacks *currState;
+UndoStack *currStack;
+UndoStackNode *tempNode;
+clock_t lastInsert;
 
 void initInput();
 

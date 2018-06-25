@@ -40,6 +40,10 @@ void initInput(){
 	
 	InitStringList(&lines);
 	addString(&lines, newLine());
+
+	currStack = initStack();
+	tempNode = newStackNode(NULL, NULL, 0, 0);
+	lastInsert = 0;
 }
 
 bool keyPressed(int key){
@@ -188,6 +192,24 @@ bool handleKeystroke(){
 		if (outputActive) {
 			unwriteLineAfterIterator(lines.it.current->str);
 			addCharacter(lines.it.current->str, c);
+			if (c == ' ' || (float)(lastInsert / CLOCKS_PER_SEC) - (float)(clock()/CLOCKS_PER_SEC) > 3) {
+				pushToStack(currStack, tempNode);
+				tempNode = newStackNode(NULL, NULL, 0, 0);
+			}
+			if (lines.it.current->str->it.current) {
+				if (tempNode->ini == NULL) {
+					tempNode->ini = lines.it.current->str->it.current;
+					tempNode->iniLine = lines.it.pos + 1;
+					tempNode->end = lines.it.current->str->it.current;
+					tempNode->endLine = lines.it.pos + 1;
+					lastInsert = clock();
+				}
+				else {
+					tempNode->end = lines.it.current->str->it.current;
+					tempNode->endLine = lines.it.pos + 1;
+					lastInsert = clock();
+				}
+			}
 			gotoxy(cursor.X, cursor.Y);
 			//putchar(c);
 			outputChar(c);
@@ -292,4 +314,41 @@ char *consoleScan() {
 	scanf("%s", str);
 	SetConsoleMode(hStdin, fdwMode);
 	return str;
+}
+
+UndoStack * initStack() {
+	UndoStack *stack = (UndoStack *)malloc(sizeof(UndoStack));
+	stack->topo = NULL;
+	return stack;
+}
+void pushToStack(UndoStack *stack, UndoStackNode *node) {
+	if (stack->topo == NULL) {
+		stack->topo = node;
+		return;
+	}
+	else {
+		node->next = stack->topo;
+		stack->topo = node;
+	}
+}
+UndoStackNode * newStackNode(StringCharacter *ini, StringCharacter *end, int iniLine, int endLine) {
+	UndoStackNode *node = (UndoStackNode *)malloc(sizeof(UndoStackNode));
+	node->ini = ini;
+	node->end = end;
+	node->iniLine = iniLine;
+	node->endLine = endLine;
+	node->next = NULL;
+	return node;
+}
+
+UndoStackNode * popStack(UndoStack *stack) {
+	UndoStackNode * node = stack->topo;
+	if (node && node->next) {
+		stack->topo = node->next;
+	}
+	else {
+		stack->topo = NULL;
+	}
+
+	return node;
 }

@@ -79,6 +79,9 @@ void RegisterAllInputCallbacks(){
 	registerCallback(currState, VK_DOWN, true, false, true, 0.00, shiftDownSelection);
 	registerCallback(currState, 'C', false, true, true, 0.00, copySelection);
 	registerCallback(currState, 'V', false, true, true, 0.50, pasteClip);
+	registerCallback(currState, 'Z', false, true, true, 0.40, undoAction);
+	registerCallback(currState, 'S', false, true, true, 0.50, saveFiled);
+	registerCallback(currState, 'O', false, true, true, 0.50, loadFiled);
 
 	//registerCallback(currState, VK_LEFT, true, false, true, 1.00, SelectLeftCB);
 	registerCallback(currState, VK_UP, false, false, true, 0.05, MoveUpCB);
@@ -125,7 +128,7 @@ void MoveLeftCB(){
 
 void MoveUpCB(){
 	freeSelection();
-	if (cursor.X == lines.it.current->str->size || lines.it.current->str->it.current->next->ch == '\n') {
+	if (cursor.X == lines.it.current->str->size || lines.it.current->str->it.current && lines.it.current->str->it.current->next->ch == '\n') {
 		if (lines.it.current->prev)
 			gotoxy(lines.it.current->prev->str->size, cursor.Y - 1);		
 	}else {
@@ -236,4 +239,29 @@ void unwriteLineAfterIterator(DynamicString *str) {
 		printf("%c", ' ');
 		ini = ini->next;
 	}
+}
+
+void undoAction() {
+	UndoStackNode * node;
+	if (tempNode->ini != NULL) {
+		node = tempNode;
+		tempNode = newStackNode(NULL, NULL, 0, 0);
+	}
+	else {
+		node = popStack(currStack);
+	}
+	outputLine = node->iniLine;
+	outputLineEnd = 10;
+	StringCharacter *aux;
+	if(node->ini->prev)
+		node->ini->prev->next = node->end->next;
+
+	if(node->end->next)
+		node->end->next->prev = node->ini->prev;
+
+	int pos = lines.it.pos;
+	tempLineSize = 100;
+	moveListIterator(&lines, node->iniLine);
+	lines.it.current->str->size = dynamicStringLen(lines.it.current->str);
+	moveListIterator(&lines, pos);
 }

@@ -41,11 +41,12 @@ void handleOutput(){
 		DWORD dw = GetLastError();
 		printf("%lu", dw);
 	}
-	if (min(csbiInfo.srWindow.Bottom, outputLineEnd)> outputLine && outputLine < lines.size) {
+
+	if (min(csbiInfo.srWindow.Bottom, outputLineEnd)> outputLine && outputLine <= lines.size) {
 		int x = cursor.X;
 		int y = cursor.Y;		
 		int i = 0;
-		int j = cursor.Y;
+		int j = max(cursor.Y, outputLine);
 		int maxSize = 0;
 		DynamicStringListNode * aux = lines.ini;
 		if (tempLineSize == -1) {
@@ -70,7 +71,7 @@ void handleOutput(){
 			if(j != end) outputChar('\n');
 		}
 
-		while (outputLine < lines.size) {
+		while (outputLine < end) {
 			gotoxy(0, outputLine);			
 			outputString(lines.it.current->str);
 			++outputLine;

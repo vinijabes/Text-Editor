@@ -76,6 +76,20 @@ void loadFile() {
 	}
 
 }
+
+void loadFiled() {
+	fileMenu = newMenu();
+	prevLines = lines;
+	lines = fileMenu->lines;
+
+	loadFile();
+
+	lines = prevLines;
+
+	outputLine = 0;
+	setConsoleDefaultInputMode();
+}
+
 void saveFile() {
 	CHAR filename[MAX_PATH];
 	OPENFILENAME ofn;
@@ -103,6 +117,15 @@ void saveFile() {
 		}
 		fclose(f);
 	}
+}
+
+void saveFiled() {
+	fileMenu = newMenu();
+	prevLines = lines;
+	lines = fileMenu->lines;
+	saveFile();
+	lines = prevLines;
+	setConsoleDefaultInputMode();
 }
 
 void newFile() {

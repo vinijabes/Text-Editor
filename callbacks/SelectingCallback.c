@@ -145,9 +145,14 @@ void copySelection() {
 		}
 		++i;
 	}
-
-    char* output = (char*)malloc(totalSize + 2);
-	output[totalSize + 1] = '\0';
+	char* output;
+	if (lineStart != lineEnd) {
+		output = (char*)malloc(totalSize + 2);
+		output[totalSize + 1] = '\0';
+	}else {
+		output = (char*)malloc(totalSize + 1);
+		output[totalSize] = '\0';
+	}
 	i = lineStart;
 	
 	int lineCharPosIni;
@@ -168,13 +173,16 @@ void copySelection() {
 		}
 
 		j = lineCharPosIni;
-		while (j <= lineCharPosEnd) {
+		if (lineStart != lineEnd && i == lineEnd) {
+			lineCharPosEnd++;
+		}
+		while (j < lineCharPosEnd) {
 			gotoxy(j + 1, cursor.Y);
 			output[auxiliarIndex + j - lineCharPosIni] = ascii_to_unicode(lines.it.current->str->it.current->ch);
 			++j;
 		}
 		if (i != lineEnd) {
-			output[auxiliarIndex + j - lineCharPosIni - 2] = '\n';
+			output[auxiliarIndex + j - lineCharPosIni - 1] = '\n';
 		}
 		auxiliarIndex += lineCharPosEnd - lineCharPosIni;
 		i++;

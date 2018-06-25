@@ -9,8 +9,11 @@ void openFileMenu();
 void closeFileMenu();
 
 void loadFile();
+void loadFiled();
 void saveFile();
+void saveFiled();
 void newFile();
+void newFiled();
 
 #endif // !MENU_CALLBACKS_H
 

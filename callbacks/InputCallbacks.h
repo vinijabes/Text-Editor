@@ -16,5 +16,7 @@ void printList();
 void breakLineCB();
 void writeToFile();
 
+void undoAction();
+
 void unwriteLineAfterIterator(DynamicString *str);
 #endif
