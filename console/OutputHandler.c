@@ -26,7 +26,6 @@ void initOutput(){
 	tempX = -1;
 	tempY = -1;
 }
-
 void handleOutput(){
 	if(consoleBuffer.X - cursor.X <= 1 || (lines.it.current && consoleBuffer.X - lines.it.current->str->size <= 1)){
 		setBufferSize(consoleBuffer.X + 5, consoleBuffer.Y);
@@ -70,13 +69,11 @@ void handleOutput(){
 		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 		while (outputLine < end) {
 			gotoxy(0, outputLine);
-			outputString(lines.it.current->str);
-			//coord.X = lines.it.current->str->size + 1;
-			//coord.Y = outputLine;
-			//SetConsoleCursorPosition(h, coord);
-			for (i = lines.it.current->str->size; i < maxSize; i++) {
+			for (i = 0; i < maxSize; i++) {
 				outputChar(' ');
 			}
+			gotoxy(0, outputLine);
+			outputString(lines.it.current->str);		
 			++outputLine;
 		}
 		x = tempX != -1 ? tempX : x;

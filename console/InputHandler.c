@@ -42,7 +42,7 @@ void initInput(){
 	addString(&lines, newLine());
 
 	currStack = initStack();
-	tempNode = newStackNode(NULL, NULL, 0, 0);
+	tempNode = newStackNode(NULL, NULL, 0, 0, WRITE);
 	lastInsert = 0;
 }
 
@@ -194,7 +194,7 @@ bool handleKeystroke(){
 			addCharacter(lines.it.current->str, c);
 			if (c == ' ' || (float)(lastInsert / CLOCKS_PER_SEC) - (float)(clock()/CLOCKS_PER_SEC) > 3) {
 				pushToStack(currStack, tempNode);
-				tempNode = newStackNode(NULL, NULL, 0, 0);
+				tempNode = newStackNode(NULL, NULL, 0, 0, WRITE);
 			}
 			if (lines.it.current->str->it.current) {
 				if (tempNode->ini == NULL) {
@@ -331,13 +331,14 @@ void pushToStack(UndoStack *stack, UndoStackNode *node) {
 		stack->topo = node;
 	}
 }
-UndoStackNode * newStackNode(StringCharacter *ini, StringCharacter *end, int iniLine, int endLine) {
+UndoStackNode * newStackNode(StringCharacter *ini, StringCharacter *end, int iniLine, int endLine, UndoType type) {
 	UndoStackNode *node = (UndoStackNode *)malloc(sizeof(UndoStackNode));
 	node->ini = ini;
 	node->end = end;
 	node->iniLine = iniLine;
 	node->endLine = endLine;
 	node->next = NULL;
+	node->type = type;
 	return node;
 }
 

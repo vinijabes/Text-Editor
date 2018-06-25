@@ -29,7 +29,7 @@ void Backspace() {
 		gotoxy(0, lines.end);
 		unwriteLineAfterIterator(lines.it.current->str);
 		
-		gotoxy(0, outputLine);
+		gotoxy(0, outputLine + 1);
 		removeString(&lines);
 	}
 	
@@ -213,6 +213,8 @@ void breakLineCB(){
 	outputLineEnd = lines.size;
 	int y = cursor.Y + 1;
 	++cursor.Y;
+	tempNode = newStackNode(NULL, NULL, 0, 0);
+	pushToStack(currStack, tempNode);
 	/*while (curr->next) {
 		moveIterator(curr->next->str, 0);
 		gotoxy(0, cursor.Y);

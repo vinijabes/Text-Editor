@@ -248,7 +248,8 @@ void concatString(DynamicString *dest, DynamicString *src) {
 	
 	if (dest->size > 0) {
 		dest->end->next = src->ini;
-		src->ini->prev = dest->end;
+		if(src->ini && src->ini->prev)
+			src->ini->prev = dest->end;
 		dest->size += src->size;
 	}else{
 		*dest = *src;
