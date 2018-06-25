@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 DynamicStringList prevLines;
+extern int outputLine;
 void openFileMenu() {
 	fileMenu = newMenu();
 	StateCallbacks *prev = currState;
@@ -29,18 +30,21 @@ void openFileMenu() {
 
 	lines = prevLines;
 	currState = prev;
+
+	outputLine = 0;
+	setConsoleDefaultInputMode();
 }
 void closeFileMenu() {
 	closeMenu(fileMenu);
 }
 
 void loadFile() {
-	CHAR filename[MAX_PATH+10];
+	CHAR filename[MAX_PATH];
 	OPENFILENAME ofn;
 	ZeroMemory(&filename, sizeof(filename));
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+	ofn.hwndOwner = NULL;
 	ofn.lpstrFilter = "Text Files\0*.txt\0Any File\0*.*\0";
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
@@ -53,17 +57,21 @@ void loadFile() {
 		DynamicStringList aux = fileMenu->lines;
 		DynamicString *str = aux.ini->str;
 		short ch;
+		int maxSize = 0;
 		while ((ch = fgetc(f)) != EOF) {
 			if (ch != '\n') {
 				pushCharacter(str, ch);
 			}else{
 				pushCharacter(str, ch);
+				maxSize = max(str->size, maxSize);
 				str = newLine();
 				pushString(&fileMenu->lines, str);
 			}
 		}
 		prevLines = fileMenu->lines;
+		setBufferSize(maxSize, prevLines.size);
 		closeFileMenu();
+		outputLine = 0;
 	}
 
 }
@@ -77,10 +85,10 @@ void saveFile() {
 	ofn.lpstrFilter = "Text Files\0*.txt\0Any File\0*.*\0";
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrTitle = "Select a File, yo!";
+	ofn.lpstrTitle = "Selecione o local do arquivo";
 	ofn.Flags = OFN_DONTADDTORECENT;
 
-	if (GetOpenFileNameA(&ofn))
+	if (GetSaveFileNameA(&ofn))
 	{
 		FILE *f = fopen(filename, "w");
 		DynamicStringListNode *aux = prevLines.ini;
@@ -95,6 +103,7 @@ void saveFile() {
 		fclose(f);
 	}
 }
+
 void newFile() {
 
 }

@@ -268,6 +268,12 @@ int ascii_to_unicode(unsigned short ch) {
 	}
 }
 
+void setConsoleDefaultInputMode() {
+	if (!SetConsoleMode(hStdin, fdwMode)) {
+		printf("ERRO");
+	}
+}
+
 char *consoleScan() {
 	SetConsoleMode(hStdin, fdwSaveOldMode);
 	char *str = (char *) malloc(50);

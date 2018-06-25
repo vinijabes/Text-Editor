@@ -20,6 +20,7 @@ void initOutput(){
 
 	//COORD newSize = {9999,9999};
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), consoleBuffer);
+	outputLine = 0;
 }
 
 void handleOutput(){
@@ -28,7 +29,20 @@ void handleOutput(){
 	}
 
 	if (consoleBuffer.Y - cursor.Y <= 1) {
-		setBufferSize(consoleBuffer.X, cursor.Y + 5);
+		setBufferSize(consoleBuffer.X, consoleBuffer.Y + 1);
+	}
+
+	CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
+	GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+	if (csbiInfo.srWindow.Bottom > outputLine && outputLine < lines.size) {
+		int x = cursor.X;
+		int y = cursor.Y;		
+		while (outputLine < lines.size) {
+			gotoxy(0, outputLine);
+			outputString(lines.it.current->str);
+			++outputLine;
+		}
+		gotoxy(x, y);
 	}
 }
 
@@ -40,9 +54,7 @@ void setDefaultAttributes(){
 	SetConsoleTextAttribute(hStdout, wOldColorAttrs);
 }
 
-void setBufferSize(int x, int y){
-	CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
-	GetConsoleScreenBufferInfo(hStdout, &csbiInfo);
+void setBufferSize(int x, int y){	
 	consoleBuffer.X = x;
 	consoleBuffer.Y = y;
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), consoleBuffer);
@@ -54,7 +66,10 @@ void setOutputState(bool state) {
 
 void outputChar(char ch) {
 	if (outputActive) {
-		putchar(ch);
+		if (ch == '\t')
+			putchar(' ');
+		else
+			putchar(ch);
 	}
 }
 void outputCharArray(char *ch) {
@@ -65,7 +80,15 @@ void outputCharArray(char *ch) {
 void outputString(DynamicString *string) {
 	StringCharacter *pos = string->ini;
 	while (pos) {
+		if (consoleBuffer.X - cursor.X <= 1) {
+			setBufferSize(cursor.X + 5, consoleBuffer.Y);
+		}
+
+		if (consoleBuffer.Y - cursor.Y <= 1) {
+			setBufferSize(consoleBuffer.X, consoleBuffer.Y + 1);
+		}
 		outputChar(pos->ch);
+		++cursor.X;
 		pos = pos->next;
 	}
 }

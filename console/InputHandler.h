@@ -69,5 +69,6 @@ void gotoxy(int x, int y);
 
 int ascii_to_unicode(unsigned short ch);
 
+void setConsoleDefaultInputMode();
 char *consoleScan();
 #endif

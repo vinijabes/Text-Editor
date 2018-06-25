@@ -20,4 +20,6 @@ void outputChar(char ch);
 void outputCharArray(char *ch);
 void outputString(DynamicString *string);
 
+int outputLine;
+
 #endif

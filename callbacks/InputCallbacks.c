@@ -124,9 +124,12 @@ void writeToFile(){
 	printf("HI");
 }
 
+extern int outputLine;
+
 void breakLineCB(){
 	DynamicStringListNode *curr = lines.it.current;
 	DynamicString *newLine = breakString(curr->str, cursor.X - 1);
+	++outputLine;
 	printString(newLine);
 	moveListIterator(&lines, cursor.Y + 1);
 	addString(&lines, newLine);
