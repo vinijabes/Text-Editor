@@ -21,5 +21,9 @@ void outputCharArray(char *ch);
 void outputString(DynamicString *string);
 
 int outputLine;
+int outputLineEnd;
+int tempLineSize; 
+int tempX;
+int tempY;
 
 #endif

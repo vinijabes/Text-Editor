@@ -16,6 +16,7 @@ void shiftUpSelection();
 void shiftDownSelection();
 
 void copySelection();
+void pasteClip();
 
 void freeSelection();
 

@@ -240,12 +240,23 @@ void handleMouse(MOUSE_EVENT_RECORD mer){
 
 void gotoxy(int x, int y){
   COORD coord;
-  coord.X = (x > 0) ? ((x > lines.it.current->str->size) ? lines.it.current->str->size : x) : 0;
-  coord.Y = (y > 0) ? ((y >= lines.size) ? lines.size - 1: y ): 0;
+  if (y == cursor.Y) {
+	  coord.X = (x > 0) ? ((x > lines.it.current->str->size) ? lines.it.current->str->size : x) : 0;
+	  coord.Y = (y > 0) ? ((y >= lines.size) ? lines.size - 1 : y) : 0;
+	  moveListIterator(&lines, coord.Y);
+  } else {
+	  coord.Y = (y > 0) ? ((y >= lines.size) ? lines.size - 1 : y) : 0;
+	  moveListIterator(&lines, coord.Y);
+	  coord.X = (x > 0) ? ((x > lines.it.current->str->size) ? lines.it.current->str->size : x) : 0;
+  }
   cursor = coord;
-  moveListIterator(&lines, coord.Y);
   moveIterator(lines.it.current->str, x - 1);
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+
+  if (lines.it.current->str->it.current && lines.it.current->str->it.current->ch == '\n' ||
+	  !lines.it.current->str->it.current && lines.it.current->next && x != 0) {
+	  gotoxy(x - 1, y);
+  }
 }
 
 int ascii_to_unicode(unsigned short ch) {
@@ -255,6 +266,7 @@ int ascii_to_unicode(unsigned short ch) {
 	case 131: return 226; //â
 	case 132: return 228; //ä
 	case 133: return 224; //à
+	case 135: return 231; //ç
 	case 136: return 234; //ê
 	case 137: return 235; //ë
 	case 138: return 232; //è

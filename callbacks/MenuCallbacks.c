@@ -72,6 +72,7 @@ void loadFile() {
 		setBufferSize(maxSize, prevLines.size);
 		closeFileMenu();
 		outputLine = 0;
+		outputLineEnd = prevLines.size + 1;
 	}
 
 }

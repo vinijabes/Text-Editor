@@ -28,7 +28,7 @@ void handleSelection() {
 		if ((selectionEnd->charPos >= charPos || selectionEnd->line > line) &&
 			(selectionIni->charPos < charPos && selectionIni->line <= line)) {
 			setDefaultAttributes();
-		} else if ((selectionEnd->charPos <= charPos || selectionEnd->line < line) &&
+		} else if ((selectionEnd->charPos <= charPos && selectionEnd->line < line) &&
 				   (selectionIni->charPos > charPos && selectionIni->line >= line)) {
 			setDefaultAttributes();
 		} else {
@@ -50,11 +50,25 @@ void handleSelection() {
 
 void shiftLeftSelection() {
 	handleSelection();
-	gotoxy(cursor.X - 1, cursor.Y);
+	if (cursor.X != 0) {
+		gotoxy(cursor.X - 1, cursor.Y);
+	}else{
+		if(lines.it.current->prev)
+			gotoxy(lines.it.current->prev->str->size, cursor.Y - 1);
+	}
 }
 
 void shiftRightSelection() {
-	gotoxy(cursor.X + 1, cursor.Y);
+	if (cursor.X == lines.it.current->str->size - 1) {
+		if (lines.it.current == lines.end) {
+			gotoxy(cursor.X + 1, cursor.Y);
+		}else {
+			gotoxy(0, cursor.Y + 1);
+		}
+	}
+	else {
+		gotoxy(cursor.X + 1, cursor.Y);
+	}
 	handleSelection();
 }
 
@@ -132,8 +146,8 @@ void copySelection() {
 		++i;
 	}
 
-    char* output = (char*)malloc(totalSize + 1);
-	output[totalSize] = '\0';
+    char* output = (char*)malloc(totalSize + 2);
+	output[totalSize + 1] = '\0';
 	i = lineStart;
 	
 	int lineCharPosIni;
@@ -154,16 +168,19 @@ void copySelection() {
 		}
 
 		j = lineCharPosIni;
-		while (j < lineCharPosEnd) {
+		while (j <= lineCharPosEnd) {
 			gotoxy(j + 1, cursor.Y);
-			output[auxiliarIndex + j - lineCharPosIni] = lines.it.current->str->it.current->ch;
+			output[auxiliarIndex + j - lineCharPosIni] = ascii_to_unicode(lines.it.current->str->it.current->ch);
 			++j;
+		}
+		if (i != lineEnd) {
+			output[auxiliarIndex + j - lineCharPosIni - 2] = '\n';
 		}
 		auxiliarIndex += lineCharPosEnd - lineCharPosIni;
 		i++;
 	}
 
-	const size_t len = totalSize + 1;
+	const size_t len = totalSize + 2;
 	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
 	memcpy(GlobalLock(hMem), output, len);
 	GlobalUnlock(hMem);
@@ -175,7 +192,40 @@ void copySelection() {
 	freeSelection();
 }
 
+void pasteClip() {
+	OpenClipboard(NULL);
+	char *text = NULL;
+	if (IsClipboardFormatAvailable(CF_TEXT)) {
+		text = GetClipboardData(CF_TEXT);
+	}
+	else if (IsClipboardFormatAvailable(CF_UNICODETEXT)) {
+		text = GetClipboardData(CF_UNICODETEXT);
+	}
+
+	outputLine = lines.it.pos;
+	while (*text) {
+		if (*text != '\n') {
+			if (*text == '\r') {
+				++text;
+				continue;
+			}
+			addCharacter(lines.it.current->str, *text);
+		}
+		else {
+			DynamicString *newStr = breakString(lines.it.current->str, lines.it.current->str->it.pos);
+			addString(&lines, newStr);
+		}
+		++text;
+	}
+	outputLineEnd = lines.it.pos + 2;
+	tempY = outputLineEnd;
+	tempX = lines.it.current->str->size;
+
+	CloseClipboard();
+}
+
 void freeSelection() {
+	if (selectionIni == NULL) return;
 	int x = cursor.X;
 	int y = cursor.Y;
 	int lineStart = min(selectionIni->line, selectionEnd->line);
@@ -224,7 +274,7 @@ void freeSelection() {
 		}
 		setDefaultAttributes();
 		j = lineCharPosIni;
-		while (j < lineCharPosEnd) {
+		while (j <= lineCharPosEnd) {
 			gotoxy(j + 1, cursor.Y);
 			printf("\b%c",lines.it.current->str->it.current->ch);
 			++j;

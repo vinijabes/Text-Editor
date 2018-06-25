@@ -8,6 +8,7 @@ void MoveLeftCB();
 void MoveUpCB();
 void MoveDownCB();
 void MoveToLineInit();
+void MoveToLineEnd();
 void Highlight();
 
 void clean();

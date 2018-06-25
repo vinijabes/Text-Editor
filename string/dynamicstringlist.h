@@ -27,6 +27,8 @@ void moveListIterator(DynamicStringList *list, size_t pos);
 void addString(DynamicStringList *list, DynamicString *string);
 void pushString(DynamicStringList *list, DynamicString *string);
 
+void removeString(DynamicStringList *list);
+
 void printAll(DynamicStringList *list);
 
 

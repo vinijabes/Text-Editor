@@ -33,8 +33,13 @@ void pushCharArray(DynamicString *str, char *ch);
 void insertCharArray(DynamicString *str, char *ch);
 void removeCharArray(DynamicString *str);
 
+void removeCharacter(DynamicString *str);
+
 DynamicString * breakString(DynamicString *str, int pos);
 DynamicString * newLine();
+int dynamicStringLen(DynamicString *str);
+
+void concatString(DynamicString *dest, DynamicString *src);
 
 void printString(DynamicString *str);
 void printStringIt(DynamicString *str);

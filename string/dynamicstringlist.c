@@ -107,3 +107,36 @@ void printAll(DynamicStringList *list){
 	}
 	
 }
+
+void removeString(DynamicStringList *list) {
+	if (list->size == 0) {
+		return;
+	}
+
+	if (list->it.current->prev) {
+		list->it.current->prev->next = list->it.current->next;
+	}
+
+	if (list->it.current->next) {
+		list->it.current->next->prev = list->it.current->prev;
+	}
+
+	DynamicStringListNode *aux = list->it.current->prev;
+	DynamicStringListNode *aux2 = list->it.current->next;
+	free(list->it.current);
+	if (list->it.current == list->end) {
+		list->end = aux;
+	}
+
+	if (list->it.current == list->ini) {
+		list->ini = aux2;
+	}
+
+	list->it.current = aux;
+	--list->it.pos;
+	--list->size;
+	if (list->size == 0) {
+		list->ini = 0;
+		list->end = 0;
+	}
+}

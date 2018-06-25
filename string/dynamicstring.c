@@ -169,12 +169,26 @@ void insertCharArray(DynamicString *str, char *ch){
 	}
 }
 
+int dynamicStringLen(DynamicString *str) {
+	StringCharacter *aux = str->ini;
+	int x = 0;
+	while (aux) {
+		++x;
+		aux = aux->next;
+	}
+
+	return x;
+}
+
 DynamicString * breakString(DynamicString *str, int pos){
 	DynamicString * newStr = newLine();
 	
 	moveIterator(str, pos);
+	if (str->it.current && str->it.current->next && str->it.current->next->ch == '\n') {
+		pushCharacter(newStr, '\n');
+		return newStr;
+	}
 	addCharacter(str, '\n');
-	
 	if(str->it.pos == str->size-1) return newLine();
 
 	newStr->ini = str->it.current->next;
@@ -186,11 +200,13 @@ DynamicString * breakString(DynamicString *str, int pos){
 	str->it.current = NULL;
 	str->it.pos = -1;
 	
-	if(pos > str->size){
+
+	int aux = str->size;
+	if(pos > str->size && pos != -1){
 		newStr->size = 0;
 	}else{
-		newStr->size = str->size - pos;
-		str->size = pos + 1;
+		str->size = dynamicStringLen(str);
+		newStr->size = dynamicStringLen(newStr);
 	}
 	
 	return newStr;
@@ -222,4 +238,19 @@ DynamicString * newLine(){
 	DynamicString * newStr = (DynamicString *) malloc(sizeof(DynamicString));
 	InitString(newStr);
 	return newStr;
+}
+
+void concatString(DynamicString *dest, DynamicString *src) {
+	if (dest->end->ch == '\n') {
+		moveIterator(dest, dest->size - 1);
+		removeCharacter(dest);
+	}
+	
+	if (dest->size > 0) {
+		dest->end->next = src->ini;
+		src->ini->prev = dest->end;
+		dest->size += src->size;
+	}else{
+		*dest = *src;
+	}
 }
