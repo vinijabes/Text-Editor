@@ -47,7 +47,38 @@ typedef struct{
 	InputCallbackList callbacks[CALLBACK_LIST_COUNT];
 } StateCallbacks;
 
+
+typedef enum undoType{
+	WRITE,
+	REMOVE,
+	PASTE,
+	NEW_LINE,
+	CONCAT_LINE
+} UndoType;
+
+typedef struct undoStackNode{
+	StringCharacter *ini;
+	StringCharacter *end;
+	int iniLine;
+	int endLine;
+	struct undoStackNode *next;
+	UndoType type;
+} UndoStackNode;
+
+typedef struct undoStack {
+	UndoStackNode *topo;
+} UndoStack;
+
+UndoStack * initStack();
+void pushToStack(UndoStack *stack, UndoStackNode *node);
+UndoStackNode * newStackNode(StringCharacter *ini, StringCharacter *end, int iniLine, int endLine, UndoType type);
+UndoStackNode * popStack(UndoStack *stack);
+void freeStack(UndoStack *stack);
+
 StateCallbacks *currState;
+UndoStack *currStack;
+UndoStackNode *tempNode;
+clock_t lastInsert;
 
 void initInput();
 
@@ -66,4 +97,10 @@ void clearInputBuffer();
 void handleMouse(MOUSE_EVENT_RECORD mer);
 
 void gotoxy(int x, int y);
+
+int ascii_to_unicode(unsigned short ch);
+int unicode_to_ascii(unsigned short ch);
+
+void setConsoleDefaultInputMode();
+char *consoleScan();
 #endif

@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <locale.h>
 #include "InputHandler.h"
+#include "OutputHandler.h"
 #include "../callbacks/InputCallbacks.h"
 
 
@@ -39,11 +40,14 @@ void initInput(){
 	
 	InitStringList(&lines);
 	addString(&lines, newLine());
+
+	currStack = initStack();
+	tempNode = NULL;
+	lastInsert = 0;
 }
 
 bool keyPressed(int key){
-	GetKeyState(VK_F12);
-	return GetKeyState(key) & 0x8000;
+	return GetAsyncKeyState(key) & 0x8000;
 }
 
 bool keyReleased(int key){
@@ -108,9 +112,11 @@ void runAllCallbacks(InputCallbackList *list){
 	InputCallbackListNode *ini = list->init;
 	
 	while(ini){
-		if(ini->callback.keyDown && keyPressed(ini->callback.key) && (float) clock()/CLOCKS_PER_SEC - (float) ini->callback.lastCall/CLOCKS_PER_SEC > ini->callback.interval){
-			ini->callback.cb();
-			ini->callback.lastCall = clock();
+		if(ini->callback.keyDown && keyPressed(ini->callback.key)){
+			if ((float)clock() / CLOCKS_PER_SEC - (float)ini->callback.lastCall / CLOCKS_PER_SEC > ini->callback.interval) {
+				ini->callback.cb();
+				ini->callback.lastCall = clock();
+			}
 		}else if(!ini->callback.keyDown && keyReleased(ini->callback.key)){
 			ini->callback.cb();
 		}
@@ -154,7 +160,7 @@ bool handleKeyboard(){
 		if(keyPressed(VK_CONTROL)){
 			runAllCallbacks(&currState->callbacks[SHIFT_CNTRL_CALLBACK]);
 			while(_kbhit()){
-				getch();
+				_getch();
 			}
 		}else{
 			runAllCallbacks(&currState->callbacks[SHIFT_CALLBACK]);		
@@ -177,16 +183,44 @@ bool handleKeyboard(){
 bool handleKeystroke(){
 	int c;
 	if(_kbhit()){		
-		c = getch();
+		c = _getch();
 		if(c == 224 || c == 0 || c == 8 || c == 27 || c == 13){
 			clearInputBuffer();
 			return false;
 		}
 
-		addCharacter(lines.it.current->str, c);
-		putchar(c);
-		++cursor.X;
-		gotoxy(cursor.X, cursor.Y);
+		if (outputActive) {
+			if (tempNode == NULL) {
+				tempNode = newStackNode(NULL, NULL, 0, 0, WRITE);
+			}
+			unwriteLineAfterIterator(lines.it.current->str);
+			addCharacter(lines.it.current->str, c);
+			if (c == ' ' || (float)(lastInsert / CLOCKS_PER_SEC) - (float)(clock()/CLOCKS_PER_SEC) > 3 || tempNode->type != WRITE) {
+				pushToStack(currStack, tempNode);
+				tempNode = newStackNode(NULL, NULL, 0, 0, WRITE);
+			}
+			if (lines.it.current->str->it.current) {
+				if (tempNode->ini == NULL) {
+					tempNode->ini = lines.it.current->str->it.current;
+					tempNode->iniLine = lines.it.pos + 1;
+					tempNode->end = lines.it.current->str->it.current;
+					tempNode->endLine = lines.it.pos + 1;
+					lastInsert = clock();
+				}
+				else {
+					tempNode->end = lines.it.current->str->it.current;
+					tempNode->endLine = lines.it.pos + 1;
+					lastInsert = clock();
+				}
+			}
+			gotoxy(cursor.X, cursor.Y);
+			//putchar(c);
+			outputChar(c);
+			gotoxy(cursor.X, cursor.Y);
+			printStringIt(lines.it.current->str);
+			++cursor.X;
+			gotoxy(cursor.X, cursor.Y);
+		}
 		return true;
 	}
 	return false;
@@ -194,7 +228,7 @@ bool handleKeystroke(){
 
 void clearInputBuffer(){
 	while(_kbhit()){
-		getch();
+		_getch();
 	}
 }
 
@@ -207,7 +241,7 @@ void handleMouse(MOUSE_EVENT_RECORD mer){
     {
         case 0:
             if(mer.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED){
-            	printf("X: %d\n", mer.dwMousePosition.X);
+            	//printf("X: %d\n", mer.dwMousePosition.X);
                 gotoxy(mer.dwMousePosition.X, mer.dwMousePosition.Y);
             }
             else if(mer.dwButtonState == RIGHTMOST_BUTTON_PRESSED){
@@ -231,10 +265,125 @@ void handleMouse(MOUSE_EVENT_RECORD mer){
 
 void gotoxy(int x, int y){
   COORD coord;
-  coord.X = x;
-  coord.Y = y;
+  if (y == cursor.Y) {
+	  coord.X = (x > 0) ? ((x > lines.it.current->str->size) ? lines.it.current->str->size : x) : 0;
+	  coord.Y = (y > 0) ? ((y >= lines.size) ? lines.size - 1 : y) : 0;
+	  moveListIterator(&lines, coord.Y);
+  } else {
+	  coord.Y = (y > 0) ? ((y >= lines.size) ? lines.size - 1 : y) : 0;
+	  moveListIterator(&lines, coord.Y);
+	  coord.X = (x > 0) ? ((x > lines.it.current->str->size) ? lines.it.current->str->size : x) : 0;
+  }
   cursor = coord;
-  moveListIterator(&lines, y);
-  moveIterator(lines.it.current->str, x);
+  moveIterator(lines.it.current->str, x - 1);
   SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+
+  if (lines.it.current->str->it.current && lines.it.current->str->it.current->ch == '\n' ||
+	  !lines.it.current->str->it.current && lines.it.current->next && x != 0) {
+	  gotoxy(x - 1, y);
+  }
+}
+
+int ascii_to_unicode(unsigned short ch) {
+	if (ch < 128) return ch;
+	switch (ch) {
+	case 130: return 233; //é
+	case 131: return 226; //â
+	case 132: return 228; //ä
+	case 133: return 224; //à
+	case 135: return 231; //ç
+	case 136: return 234; //ê
+	case 137: return 235; //ë
+	case 138: return 232; //è
+	case 139: return 239; //ï
+	case 140: return 238; //î
+	case 141: return 236; //ì
+	case 160: return 225; //á
+	case 162: return 243; //ó
+	case 161: return 237; //í
+	case 198: return 227; //ã
+	}
+}
+
+int unicode_to_ascii(unsigned short ch) {
+	if (ch < 128) return ch;
+	switch (ch) {
+	case 233: return 130; //é
+	case 226: return 131; //â
+	case 228: return 132; //ä
+	case 224: return 133; //à
+	case 231: return 135; //ç
+	case 234: return 136; //ê
+	case 235: return 137; //ë
+	case 232: return 138; //è
+	case 239: return 139; //ï
+	case 238: return 140; //î
+	case 236: return 141; //ì
+	case 225: return 160; //á
+	case 243: return 162; //ó
+	case 237: return 161; //í
+	case 227: return 198; //ã
+	}
+}
+
+void setConsoleDefaultInputMode() {
+	if (!SetConsoleMode(hStdin, fdwMode)) {
+		printf("ERRO");
+	}
+}
+
+char *consoleScan() {
+	SetConsoleMode(hStdin, fdwSaveOldMode);
+	char *str = (char *) malloc(50);
+	scanf("%s", str);
+	SetConsoleMode(hStdin, fdwMode);
+	return str;
+}
+
+UndoStack * initStack() {
+	UndoStack *stack = (UndoStack *)malloc(sizeof(UndoStack));
+	stack->topo = NULL;
+	return stack;
+}
+void pushToStack(UndoStack *stack, UndoStackNode *node) {
+	if (stack->topo == NULL) {
+		stack->topo = node;
+		return;
+	}
+	else {
+		node->next = stack->topo;
+		stack->topo = node;
+	}
+}
+UndoStackNode * newStackNode(StringCharacter *ini, StringCharacter *end, int iniLine, int endLine, UndoType type) {
+	UndoStackNode *node = (UndoStackNode *)malloc(sizeof(UndoStackNode));
+	node->ini = ini;
+	node->end = end;
+	node->iniLine = iniLine;
+	node->endLine = endLine;
+	node->next = NULL;
+	node->type = type;
+	return node;
+}
+
+UndoStackNode * popStack(UndoStack *stack) {
+	UndoStackNode * node = stack->topo;
+	if (node && node->next) {
+		stack->topo = node->next;
+	}
+	else {
+		stack->topo = NULL;
+	}
+
+	return node;
+}
+
+void freeStack(UndoStack *stack) {
+	UndoStackNode *node = stack->topo;
+	UndoStackNode *node2;
+	while (node) {
+		node2 = node;
+		node = node->next;
+		free(node2);
+	}
 }

@@ -1,0 +1,24 @@
+﻿  InputCallbacks.c
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(54): warning C4047: 'função': 'int' difere em níveis de indireção de 'DynamicStringListNode *'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(54): warning C4024: 'gotoxy': tipos diferentes para parâmetro formal e real 2
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(75): warning C4047: 'função': 'int' difere em níveis de indireção de 'DynamicStringListNode *'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(75): warning C4024: 'gotoxy': tipos diferentes para parâmetro formal e real 2
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(103): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(104): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(111): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(117): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(118): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(120): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(121): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(122): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(123): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(124): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(125): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(126): warning C4305: 'função': truncamento de 'double' para 'float'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(286): warning C4101: 'aux': variável local não referenciada
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(344): warning C4133: '=': tipos incompatíveis - de 'UndoStackNode *' para 'ch *'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(348): warning C4133: '=': tipos incompatíveis - de 'UndoStackNode *' para 'StringCharacter *'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(352): warning C4133: '=': tipos incompatíveis - de 'UndoStackNode *' para 'ch *'
+c:\users\vinicius\source\repos\texteditor\texteditor\callbacks\inputcallbacks.c(355): warning C4133: '=': tipos incompatíveis - de 'UndoStackNode *' para 'StringCharacter *'
+  TextEditor.vcxproj -> C:\Users\Vinicius\Source\Repos\TextEditor\Debug\TextEditor.exe
+  TextEditor.vcxproj -> C:\Users\Vinicius\Source\Repos\TextEditor\Debug\TextEditor.pdb (Partial PDB)

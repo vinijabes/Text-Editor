@@ -11,7 +11,7 @@ typedef struct ch{
 
 typedef struct it{
 	StringCharacter *current;
-	size_t pos;
+	int pos;
 } StringIterator;
 
 typedef struct str{
@@ -31,11 +31,20 @@ void insertCharacter(DynamicString *str, int ch);
 void addCharArray(DynamicString *str, char *ch);
 void pushCharArray(DynamicString *str, char *ch);
 void insertCharArray(DynamicString *str, char *ch);
+void removeCharArray(DynamicString *str);
+
+void removeCharacter(DynamicString *str);
 
 DynamicString * breakString(DynamicString *str, int pos);
 DynamicString * newLine();
+int dynamicStringLen(DynamicString *str);
+
+void concatString(DynamicString *dest, DynamicString *src);
 
 void printString(DynamicString *str);
+void printStringIt(DynamicString *str);
 
+void copyString(DynamicString *dest, DynamicString *src);
 
+void freeDynamicString(DynamicString *str);
 #endif

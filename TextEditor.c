@@ -21,6 +21,23 @@ int main(int argc, char *argv[]) {
 		handleOutput();
 	}
 
+	DynamicString c;
+	InitString(&c);
+	pushCharacter(&c, 'a');
+	moveIterator(&c, -1);
+	addCharacter(&c, 'b');
+	addCharacter(&c, 'c');
+	moveIterator(&c, 0);
+	addCharacter(&c, 'd');
+	pushCharacter(&c, 'e');
+	addCharacter(&c, 'f');
+	printString(&c);
+
+	DynamicString *b = breakString(&c, 0);
+	printf("\n");
+	printString(&c);
+	printString(b);
+
 	system("pause");
 
 	return 0;
